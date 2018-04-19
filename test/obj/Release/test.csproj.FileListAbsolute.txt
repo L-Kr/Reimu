@@ -1,0 +1,13 @@
+F:\学霸\C#\灵梦-桌面精灵\test\bin\Release\test.exe.config
+F:\学霸\C#\灵梦-桌面精灵\test\bin\Release\test.exe
+F:\学霸\C#\灵梦-桌面精灵\test\bin\Release\test.pdb
+F:\学霸\C#\灵梦-桌面精灵\test\bin\Release\Interop.WMPLib.dll
+F:\学霸\C#\灵梦-桌面精灵\test\bin\Release\AxInterop.WMPLib.dll
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\Interop.WMPLib.dll
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\AxInterop.WMPLib.dll
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\test.csproj.ResolveComReference.cache
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\test.Form1.resources
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\test.Properties.Resources.resources
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\test.csproj.GenerateResource.Cache
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\test.exe
+F:\学霸\C#\灵梦-桌面精灵\test\obj\Release\test.pdb
