@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Diagnostics;
@@ -16,78 +15,17 @@ namespace test
         {
             InitializeComponent();
         }
-        public const string Node_GamesPath = "GamesPath";
-        public const string Node_MusicPath = "MusicPath";
-        public const string Node_WebCollection = "WebCollection";
-        public const string Node_Name = "Name";
-        public const string Node_Class = "Class";
-        public const string Node_Path = "Path";
+
         Point Mousepoint;
         bool MouseLeft = false;
         public int Imageindex = 1;    //1为眨眼，2为无语
         int zhen = imagegif1.GetFrameCount(frameDimension);   //帧数控制
-        public List<string> My_Music = new List<string>();
+        public List<string> Gamepath = new List<string>();   //游戏路径
+        public List<string> Musicpath = new List<string>();  //音乐路径
         public Dictionary<string, string> RmCommond = new Dictionary<string, string>();   //口令
         public SpeechRecognitionEngine Sre = new SpeechRecognitionEngine();
         public GrammarBuilder Gb = new GrammarBuilder();
         public bool SreCom = false;
-
-        public class My_XmlDocument
-        {
-            public My_XmlDocument(string FileName)
-            {
-                name = FileName;
-            }
-            private XmlDocument My_Xml = new XmlDocument();
-            private XmlElement My_Xml_ele;   //将操作数据所在大类（如游戏？音乐？网址？）
-            private string name;
-            public void Load()
-            {
-                My_Xml.Load(name);
-            }
-            public void Save()
-            {
-                My_Xml.Save(name);
-            }
-            public XmlNodeList LoadingList(string Parent_Node)
-            {
-                return My_Xml.SelectSingleNode("Config").SelectSingleNode(Parent_Node).SelectNodes("Item");
-            }
-            public void InsertItems(string ParentNodeName)
-            {
-                My_Xml_ele = My_Xml.CreateElement("Item");
-                My_Xml.SelectSingleNode("Config").SelectSingleNode(ParentNodeName).AppendChild(My_Xml_ele);
-            }
-            public void Insert(string XmlNodeName, string XmlText)
-            {
-                XmlElement My_New_Xml_Node = My_Xml.CreateElement(XmlNodeName);
-                My_New_Xml_Node.InnerText = XmlText;
-                My_Xml_ele.AppendChild(My_New_Xml_Node);
-            }
-            public bool RemoveItem(string Parent_Node, string R_Node, string R_Name)
-            {
-                XmlNodeList Items = My_Xml.SelectSingleNode("Config").SelectSingleNode(Parent_Node).SelectNodes("Item");
-                for (int i = 0; i < Items.Count; i++)
-                    if (Items.Item(i).SelectSingleNode(R_Node).InnerText == R_Name)
-                    {
-                        My_Xml.SelectSingleNode("Config").SelectSingleNode(Parent_Node).RemoveChild(Items.Item(i));
-                        return true;
-                    }
-                return false;
-            }
-            public bool RemoveItem(string Parent_Node, string R_Node, string R_Name, string R_Node1, string R_Name1)
-            {
-                XmlNodeList Items = My_Xml.SelectSingleNode("Config").SelectSingleNode(Parent_Node).SelectNodes("Item");
-                for (int i = 0; i < Items.Count; i++)
-                    if (Items.Item(i).SelectSingleNode(R_Node).InnerText == R_Name && Items.Item(i).SelectSingleNode(R_Node1).InnerText == R_Name1)
-                    {
-                        My_Xml.SelectSingleNode("Config").SelectSingleNode(Parent_Node).RemoveChild(Items.Item(i));
-                        return true;
-                    }
-                return false;
-            }
-        }
-        public My_XmlDocument My_Xml = new My_XmlDocument("config.xml");
 
         /*绘制动画*/
         #region
@@ -170,6 +108,23 @@ namespace test
         private void Form1_Load(object sender, EventArgs e)
         {
             string s;
+
+            /*将GamesPath文件中所有启动路径信息读出到泛型中*/
+            FileStream fs = new FileStream("Data/GamesPath", FileMode.OpenOrCreate);
+            StreamReader sr = new StreamReader(fs);
+            while ((s = sr.ReadLine()) != null)
+                Gamepath.Add(s);
+            sr.Close();
+            fs.Close();
+
+            /*将MusicPath文件中的音乐路径信息读出到泛型中*/
+            FileStream MusicPath = new FileStream("Data/MusicPath", FileMode.OpenOrCreate);
+            StreamReader MusicSR = new StreamReader(MusicPath);
+            while ((s = MusicSR.ReadLine()) != null)
+                Musicpath.Add(s);
+            MusicSR.Close();
+            MusicPath.Close();
+
             /*将口令.txt文件中的口令信息读出到泛型中*/
             try
             {
@@ -188,41 +143,47 @@ namespace test
                 MessageBox.Show("口令.txt文件内容出错");
             }
 
-            /*将配置文件中的Games信息读出*/
-            My_Xml.Load();
-            XmlNodeList Items = My_Xml.LoadingList(Node_GamesPath);
-            foreach(XmlNode x in Items)
+            /*将GamesPath文件中的同人游戏的文件名读出并显示到界面上*/
+            foreach (string str in Gamepath)
             {
-                if (x.SelectSingleNode(Node_Class).InnerText == "官方游戏")
-                    continue;
-                ToolStripMenuItem thother = new ToolStripMenuItem();
-                ToolStripMenuItem other = new ToolStripMenuItem();
-                thother.Name = x.SelectSingleNode(Node_Name).InnerText;
-                thother.Text = x.SelectSingleNode(Node_Name).InnerText;
-                other.Name = x.SelectSingleNode(Node_Name).InnerText;
-                other.Text = x.SelectSingleNode(Node_Name).InnerText;
-                if (x.SelectSingleNode(Node_Class).InnerText == "同人游戏")
+                string[] st = str.Split('|');
+                if (st[0] == "同人游戏")
                 {
+                    ToolStripMenuItem thother = new ToolStripMenuItem();
+                    ToolStripMenuItem other = new ToolStripMenuItem();
+                    thother.Name = st[1];
+                    thother.Text = st[1];
+                    other.Name = st[1];
+                    other.Text = st[1];
                     启动游戏.DropDownItems.Add(thother);
                     删除同人游戏.DropDownItems.Add(other);
                 }
-                if(x.SelectSingleNode(Node_Class).InnerText == "常用软件")
+                if (st[0] == "常用软件")
                 {
+                    ToolStripMenuItem thother = new ToolStripMenuItem();
+                    ToolStripMenuItem other = new ToolStripMenuItem();
+                    thother.Name = st[1];
+                    thother.Text = st[1];
+                    other.Name = st[1];
+                    other.Text = st[1];
                     启动软件.DropDownItems.Add(thother);
                     删除常用软件.DropDownItems.Add(other);
                 }
             }
 
-            /*将配置文件中的WebCollection信息读出*/
-            My_Xml.Load();
-            Items = My_Xml.LoadingList(Node_WebCollection);
-            foreach(XmlNode x in Items)
+            /*将WebCollection文件中的网站链接信息读出并显示到界面上*/
+            FileStream Webfs = new FileStream("Data/WebCollection", FileMode.OpenOrCreate);
+            StreamReader Websr = new StreamReader(Webfs);
+            while((s = Websr.ReadLine())!=null)
             {
+                string[] str = s.Split('|');
                 ToolStripMenuItem Webts = new ToolStripMenuItem();
-                Webts.Text = x.SelectSingleNode(Node_Name).InnerText;
-                Webts.Tag = x.SelectSingleNode(Node_Path).InnerText;
+                Webts.Text = str[0];
+                Webts.Tag = str[1];
                 网站链接ToolStripMenuItem.DropDownItems.Add(Webts);
             }
+            Websr.Close();
+            Webfs.Close();
 
             /*语音识别准备*/
             Sre.SetInputToDefaultAudioDevice();
@@ -266,10 +227,11 @@ namespace test
                 MessageBox.Show("请输入名称与网址");
             else
             {
-                My_Xml.InsertItems(Node_WebCollection);
-                My_Xml.Insert(Node_Name, 单击此处输入名称.Text);
-                My_Xml.Insert(Node_Class, 单击此处输入网址.Text);
-                My_Xml.Save();
+                FileStream webfs = new FileStream("Data/WebCollection", FileMode.Append);
+                StreamWriter websw = new StreamWriter(webfs);
+                websw.WriteLine(单击此处输入名称.Text + "|" + 单击此处输入网址.Text);
+                websw.Close();
+                webfs.Close();
                 ToolStripMenuItem WebC = new ToolStripMenuItem();
                 WebC.Tag = 单击此处输入网址.Text;
                 WebC.Text = 单击此处输入名称.Text;
@@ -368,15 +330,15 @@ namespace test
         /*开始游戏*/
         void GameStart(string gameclass, string gamename)
         {
-            XmlNodeList Items = My_Xml.LoadingList(Node_GamesPath);
-            foreach (XmlNode x in Items)
+            foreach (string s in Gamepath)
             {
-                if (x.SelectSingleNode(Node_Name).InnerText == gamename && x.SelectSingleNode(Node_Class).InnerText == gameclass)
+                string[] gp = s.Split('|');
+                if (gp[1] == gamename)
                 {
                     Process p = new Process();
-                    p.StartInfo.FileName = x.SelectSingleNode(Node_Path).InnerText;
+                    p.StartInfo.FileName = gp[2];
                     p.StartInfo.UseShellExecute = false;
-                    p.StartInfo.WorkingDirectory = Path.GetDirectoryName(x.SelectSingleNode(Node_Path).InnerText);
+                    p.StartInfo.WorkingDirectory = Path.GetDirectoryName(gp[2]);
                     p.Start();
                     return;
                 }
@@ -390,11 +352,31 @@ namespace test
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
+                FileStream fs = new FileStream("Data/GamesPath", FileMode.Create);
+                StreamWriter sw = new StreamWriter(fs);
                 if (Gname == null)
                     Gname = openFileDialog1.SafeFileName;
-
-                if (!My_Xml.RemoveItem(Node_GamesPath, Node_Class, Gclass, Node_Name, Gname))  //返回false即表示这是新数据
+                string st = null;
+                foreach (string s in Gamepath)
                 {
+                    string[] str = s.Split('|');
+                    if (str[0] == Gclass && str[1] == Gname)
+                    {
+                        st = s;
+                        sw.WriteLine(Gclass + "|" + Gname + "|" + openFileDialog1.FileName);
+                    }
+                    else
+                        sw.WriteLine(s);
+                }
+                if (st != null)
+                {
+                    Gamepath.Remove(st);
+                    Gamepath.Add(Gclass + "|" + Gname + "|" + openFileDialog1.FileName);
+                }
+                else
+                {
+                    Gamepath.Add(Gclass + "|" + Gname + "|" + openFileDialog1.FileName);
+                    sw.WriteLine(Gclass + "|" + Gname + "|" + openFileDialog1.FileName);
                     ToolStripMenuItem thother = new ToolStripMenuItem();
                     ToolStripMenuItem other = new ToolStripMenuItem();
                     thother.Name = Gname;
@@ -412,11 +394,8 @@ namespace test
                         删除常用软件.DropDownItems.Add(other);
                     }
                 }
-                My_Xml.InsertItems(Node_GamesPath);
-                My_Xml.Insert(Node_Name, Gname);
-                My_Xml.Insert(Node_Class, Gclass);
-                My_Xml.Insert(Node_Path, openFileDialog1.FileName);
-                My_Xml.Save();
+                sw.Close();
+                fs.Close();
             }
         }
 
@@ -435,15 +414,28 @@ namespace test
 
         private void 删除同人游戏_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            My_Xml.RemoveItem(Node_GamesPath, Node_Class, "同人游戏", Node_Name, e.ClickedItem.Text);
-            My_Xml.Save();
+            FileStream fs = new FileStream("Data/GamesPath", FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs);
+            string s = null;
+            foreach (string str in Gamepath)
+            {
+                string[] st = str.Split('|');
+                if (st[0] == "同人游戏" && st[1] == e.ClickedItem.Text)
+                    s = str;
+                else
+                    sw.WriteLine(str);
+            }
+            Gamepath.Remove(s);
+            string[] t = s.Split('|');
             for (int i = 0; i < 启动游戏.DropDownItems.Count; i++)
             {
-                if (启动游戏.DropDownItems[i].Text == e.ClickedItem.Text)
+                if (启动游戏.DropDownItems[i].Text == t[1])
                     启动游戏.DropDownItems.RemoveAt(i);
-                if (删除同人游戏.DropDownItems[i].Text == e.ClickedItem.Text)
+                if (删除同人游戏.DropDownItems[i].Text == t[1])
                     删除同人游戏.DropDownItems.RemoveAt(i);
             }
+            sw.Close();
+            fs.Close();
         }
 
         /*常用软件*/
@@ -459,15 +451,28 @@ namespace test
 
         private void 删除常用软件_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            My_Xml.RemoveItem(Node_GamesPath, Node_Class, "常用软件", Node_Name, e.ClickedItem.Text);
-            My_Xml.Save();
+            FileStream fs = new FileStream("Data/GamesPath", FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs);
+            string s = null;
+            foreach (string str in Gamepath)
+            {
+                string[] st = str.Split('|');
+                if (st[0] == "常用软件" && st[1] == e.ClickedItem.Text)
+                    s = str;
+                else
+                    sw.WriteLine(str);
+            }
+            Gamepath.Remove(s);
+            string[] t = s.Split('|');
             for (int i = 0; i < 启动软件.DropDownItems.Count; i++)
             {
-                if (启动软件.DropDownItems[i].Text == e.ClickedItem.Text)
+                if (启动软件.DropDownItems[i].Text == t[1])
                     启动软件.DropDownItems.RemoveAt(i);
-                if (删除常用软件.DropDownItems[i].Text == e.ClickedItem.Text)
+                if (删除常用软件.DropDownItems[i].Text == t[1])
                     删除常用软件.DropDownItems.RemoveAt(i);
             }
+            sw.Close();
+            fs.Close();
         }
 
         /*官方游戏*/
@@ -514,39 +519,37 @@ namespace test
             Music.Title = "请选择音乐文件";
             if (Music.ShowDialog() == DialogResult.OK)
             {
-                XmlNodeList Items = My_Xml.LoadingList(Node_MusicPath);
-                foreach(string New_music in Music.FileNames)
+                FileStream MusicPath = new FileStream("Data/MusicPath", FileMode.Append);
+                StreamWriter MusicSW = new StreamWriter(MusicPath);
+                foreach (string music in Music.FileNames)
                 {
-                    bool Is_exist = false;
-                    foreach(XmlNode x in Items)
-                    {
-                        if(x.SelectSingleNode(Node_Path).InnerText == New_music)
+                    bool IsChongfu = false;
+                    foreach (string oldmusic in Musicpath)
+                        if (oldmusic == music)
                         {
-                            Is_exist = true;
+                            IsChongfu = true;
                             break;
                         }
-                    }
-                    if(!Is_exist)
-                    {
-                        My_Xml.InsertItems(Node_MusicPath);
-                        My_Xml.Insert(Node_Path, New_music);
-                        My_Xml.Save();
-                        My_Music.Add(New_music);
-                    }
+                    if (IsChongfu)
+                        continue;
+                    MusicSW.WriteLine(music);
+                    Musicpath.Add(music);
                 }
+                MusicSW.Close();
+                MusicPath.Close();
             }
         }
 
         /*播放歌曲函数*/
         public void MusicPlay()
         {
-            if (My_Music.Count == 0)
+            if (Musicpath.Count == 0)
             {
                 MessageBox.Show("音乐播放列表为空，请先添加音乐！");
                 return;
             }
             Random r = new Random();
-            MusicPlayer.URL = My_Music[r.Next(My_Music.Count)];
+            MusicPlayer.URL = Musicpath[r.Next(Musicpath.Count)];
             ImageAnimator.StopAnimate(imagegif, new EventHandler(this.OnFrameChanged));
             imagegif = imagegif5;
             Imageindex = 2;
@@ -582,7 +585,7 @@ namespace test
         {
             timer2.Stop();
             Random r = new Random();
-            MusicPlayer.URL = My_Music[r.Next(My_Music.Count)];
+            MusicPlayer.URL = Musicpath[r.Next(Musicpath.Count)];
         }
         #endregion
 

@@ -14,23 +14,10 @@ namespace test
         [STAThread]
         static void Main()
         {
-            try
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new Form1());
-                
-            }
-            catch (Exception ex)
-            {
-                using (System.IO.FileStream fs = new System.IO.FileStream("error.txt", System.IO.FileMode.Create, System.IO.FileAccess.Write))
-                {
-                    using (System.IO.StreamWriter sw = new System.IO.StreamWriter(fs))
-                    {
-                        sw.Write(ex.ToString());
-                    }
-                }
-            }
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
+
         }
 
     }
