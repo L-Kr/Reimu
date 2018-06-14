@@ -1,34 +1,8 @@
-<Config>
+﻿<Config>
   <GamesPath>
-    <Item>
-      <Name>th143c.exe</Name>
-      <Class>同人游戏</Class>
-      <Path>E:\东方Project\弹幕天邪鬼\th143c.exe</Path>
-    </Item>
-    <Item>
-      <Name>东方夏夜祭.exe</Name>
-      <Class>常用软件</Class>
-      <Path>E:\东方Project\东方夏夜祭\东方夏夜祭.exe</Path>
-    </Item>
   </GamesPath>
   <MusicPath>
-    <Item>
-      <Path>F:\新建文件夹\BGM\Clannad - 潮鳴り (潮鸣).mp3</Path>
-    </Item>
-    <Item>
-      <Path>F:\新建文件夹\BGM\Clannad - 潮鳴りⅡ (潮鸣Ⅱ).mp3</Path>
-    </Item>
-    <Item>
-      <Path>F:\新建文件夹\BGM\Clannad - 空に光る (天空中闪烁着光).mp3</Path>
-    </Item>
-    <Item>
-      <Path>F:\新建文件夹\BGM\Clannad - 小さなてのひら.mp3</Path>
-    </Item>
   </MusicPath>
   <WebCollection>
-    <Item>
-      <Name>腾讯</Name>
-      <Class>www.qq.com</Class>
-    </Item>
   </WebCollection>
 </Config>

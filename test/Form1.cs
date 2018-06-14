@@ -268,7 +268,7 @@ namespace test
             {
                 My_Xml.InsertItems(Node_WebCollection);
                 My_Xml.Insert(Node_Name, 单击此处输入名称.Text);
-                My_Xml.Insert(Node_Class, 单击此处输入网址.Text);
+                My_Xml.Insert(Node_Path, 单击此处输入网址.Text);
                 My_Xml.Save();
                 ToolStripMenuItem WebC = new ToolStripMenuItem();
                 WebC.Tag = 单击此处输入网址.Text;
