@@ -183,9 +183,9 @@ namespace test
                 RmCommondSR.Close();
                 RmCommondPath.Close();
             }
-            catch
+            catch(Exception ex)
             {
-                MessageBox.Show("口令.txt文件内容出错");
+                MessageBox.Show(ex.ToString());
             }
 
             /*将配置文件中的Games信息读出*/
@@ -225,7 +225,16 @@ namespace test
             }
 
             /*语音识别准备*/
-            Sre.SetInputToDefaultAudioDevice();
+            try   //有语音设备
+            {
+                Sre.SetInputToDefaultAudioDevice();
+            }
+            catch   //没有检测到语音设备
+            {
+                MessageBox.Show("没有检测到语音输入设备，已停用语音识别功能");
+                语音识别开启ToolStripMenuItem.Enabled = false;
+                Sre.SetInputToNull();
+            }
             Gb.Append(new Choices(new string[] {
                 RmCommond["唤醒"],
                 RmCommond["退出"],
